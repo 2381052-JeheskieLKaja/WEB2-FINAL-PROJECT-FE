@@ -1,0 +1,53 @@
+/* BaseLayout.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff; /* White background for the body */
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Header styling */
+  .header {
+    padding: 1rem 2rem;
+    background-color: #272727; /* Blue background for the header */
+    color: white; /* White text color */
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow to add depth */
+  }
+  
+  /* Main content styling */
+  .main {
+    padding: 2rem;
+    max-width: 1900px;
+    margin: 0 auto;
+    background-color: white; /* White background for the main content */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Soft shadow */
+  }
+
+  .header h1 {
+    color: white;
+    font-family: Poppins;
+  }
+  
+  /* Footer styling */
+  .footer {
+    padding: 1rem;
+    background-color: #f8f9fa; /* Light gray footer background */
+    text-align: center;
+    font-size: 14px;
+    color: #6c757d; /* Muted text color */
+    margin-top: 2rem;
+    border-top: 1px solid #e2e2e2; /* Light border separating the footer */
+  }
+  
+  /* Footer text */
+  .footer p {
+    margin: 0;
+  }
+  

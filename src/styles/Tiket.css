@@ -1,0 +1,201 @@
+/* General App Styling */
+.tiket-app-container {
+  font-family: sans-serif;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+h1, h2 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Loading and Error Messages */
+.loading-indicator {
+  text-align: center;
+  padding: 15px;
+  color: #555;
+  font-style: italic;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #e57373;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Form Styling */
+.tiket-form-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="datetime-local"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding in width */
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px; /* Space between buttons */
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+.form-actions button[type="submit"]:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.form-actions button[type="button"] {
+  background-color: #ffc107; /* Yellow */
+  color: #333;
+}
+.form-actions button[type="button"]:hover:not(:disabled) {
+  background-color: #e0a800;
+}
+
+
+.form-actions button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+/* Ticket List Styling */
+.tiket-list-container {
+  margin-top: 30px;
+}
+
+.tiket-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tiket-item {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tiket-info {
+  flex-grow: 1;
+  margin-right: 15px;
+  line-height: 1.5;
+}
+
+.tiket-info strong {
+    font-size: 1.1em;
+    color: #0056b3;
+}
+
+.tiket-actions {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically on small screens if needed */
+  gap: 8px; /* Space between edit/delete */
+}
+
+.tiket-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.tiket-actions button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+
+.tiket-actions button:first-of-type { /* Edit button */
+  background-color: #007bff; /* Blue */
+  color: white;
+}
+.tiket-actions button:first-of-type:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.tiket-actions .delete-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+.tiket-actions .delete-button:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+/* Responsive adjustments (optional example) */
+@media (max-width: 600px) {
+  .tiket-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tiket-actions {
+    margin-top: 10px;
+    width: 100%;
+    flex-direction: row; /* Keep buttons side-by-side */
+    justify-content: flex-end;
+  }
+   .form-actions {
+      flex-direction: column;
+   }
+   .form-actions button {
+      width: 100%;
+   }
+}

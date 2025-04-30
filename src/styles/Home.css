@@ -1,0 +1,31 @@
+/* Home Container */
+.home-container {
+  background-color: #f1f1f1; /* Background abu-abu terang */
+  /* Menambahkan padding atas dan bawah */
+  min-height: fit-content; /* Menjamin agar halaman mengambil seluruh tinggi layar */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Header Section */
+.home-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.home-header h2 {
+  font-size: 2.5rem; /* Ukuran font besar untuk judul */
+  color: #000; /* Warna hitam untuk judul */
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.home-header p {
+  font-size: 1.1rem;
+  color: #666; /* Warna abu-abu gelap untuk teks deskripsi */
+  max-width: 800px;
+  margin: 0 auto;
+}

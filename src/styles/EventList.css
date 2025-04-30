@@ -1,0 +1,123 @@
+/* Container list event */
+.event-list-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(300px, 1fr)
+  ); /* Mengatur grid untuk card lebih fleksibel */
+  gap: 5rem; /* Memberikan jarak antar card */
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  height: fit-content; /* Memastikan container mengisi seluruh tinggi layar */
+  overflow: hidden; /* Menghindari scroll vertikal */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Menjaga card tetap teratur di bagian atas */
+  flex-wrap: wrap;
+}
+
+/* Event Card */
+.event-card {
+  background-color: #ffffff;
+  border-radius: 16px; /* Lebih bulat */
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  height: 500px; /* Memastikan card mengisi seluruh tinggi */
+}
+
+/* Gambar Event */
+.event-card img {
+  margin: 0 auto;
+  width: 300px; /* Memastikan gambar mengisi lebar card */
+  height: 200px; /* Menyelaraskan tinggi gambar agar seragam */
+  object-fit: cover; /* Memastikan gambar tetap proporsional dan tidak terdistorsi */
+  transition: transform 0.3s ease;
+  object-position: center; /* Memastikan gambar terpusat secara vertikal dan horizontal */
+}
+
+/* Content Card */
+.event-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+/* Nama Event */
+.event-name {
+  font-size: 1.75rem; /* Ukuran font nama event lebih proporsional */
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  flex-grow: 0;
+}
+
+/* Categories / Details */
+.event-categories {
+  font-size: 1rem; /* Ukuran font kategori konsisten */
+  color: #555;
+  line-height: 1.4;
+  flex-grow: 0;
+}
+
+/* Button Pesan Sekarang */
+.event-order-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #007bff, #00d4ff);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  align-self: center; /* Menjaga button di tengah */
+}
+
+.event-order-button:hover {
+  background: linear-gradient(135deg, #0056b3, #00aaff);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Hover Effects Card */
+.event-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover img {
+  transform: scale(1.05); /* Efek hover gambar lebih lembut */
+}
+
+/* Media Query untuk Responsif */
+@media (max-width: 768px) {
+  .event-name {
+    font-size: 1.5rem; /* Ukuran font nama event lebih kecil di layar lebih kecil */
+  }
+
+  .event-list-container {
+    padding: 1rem; /* Mengurangi padding di layar kecil */
+  }
+
+  .event-card {
+    max-width: 100%; /* Memastikan card tidak melebar lebih dari layar */
+    height: auto;
+  }
+
+  .event-order-button {
+    padding: 0.5rem 1rem; /* Menyesuaikan ukuran button */
+  }
+}
