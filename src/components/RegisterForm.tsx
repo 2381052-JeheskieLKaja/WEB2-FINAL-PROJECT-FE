@@ -6,6 +6,8 @@ const RegisterForm = () => {
   const { register } = useAuth(); // Nanti kita tambahkan function `register` di AuthProvider
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [nama, setNama] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -23,7 +25,7 @@ const RegisterForm = () => {
     }
 
     try {
-      await register({ nama: username, email: username, password });
+      await register({ nama, email, password, username });
       alert("Registrasi berhasil! Silahkan login.");
       navigate("/login");
     } catch (error) {
@@ -44,6 +46,20 @@ const RegisterForm = () => {
           className="w-full p-2 border mb-4"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="nama"
+          placeholder="nama"
+          className="w-full p-2 border mb-4"
+          value={nama}
+          onChange={(e) => setNama(e.target.value)}
+        />
+        <input
+          type="email"
+          placeholder="email"
+          className="w-full p-2 border mb-4"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
