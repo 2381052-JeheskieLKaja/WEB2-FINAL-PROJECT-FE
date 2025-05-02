@@ -1,22 +1,19 @@
-// src/components/Checkout.tsx
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../utils/AuthProvider"; // Adjust path
 import {
   fetchCheckouts,
   createCheckout,
   updateCheckout,
   deleteCheckout
-} from "../services/CheckoutAPI"; // Adjust path
-import { Checkout as CheckoutType } from "../types/Checkout"; // Rename import to avoid conflict
+} from "../services/checkout.service";
+import { Checkout } from "../types/Checkout";
 import { fetchPayments } from "../services/payment.service";
 import { PembayaranTiket } from "../types/PembayaranTiket";
 
-const Checkout: React.FC = () => {
-  const [checkouts, setCheckouts] = useState<CheckoutType[]>([]);
+const CheckoutManagement: React.FC = () => {
+  const [checkouts, setCheckouts] = useState<Checkout[]>([]);
   const [payments, setPayments] = useState<PembayaranTiket[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCheckout, setSelectedCheckout] = useState<CheckoutType | null>(
+  const [selectedCheckout, setSelectedCheckout] = useState<Checkout | null>(
     null
   );
   const [formData, setFormData] = useState({
@@ -25,13 +22,6 @@ const Checkout: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const { pembayaranId } = useParams<{ pembayaranId: string }>(); // Get ID from URL
-  const { getToken } = useAuth();
-  const token = getToken();
-
-  // Parse the ID from string to number
-  const paymentIdParam = pembayaranId ? parseInt(pembayaranId, 10) : undefined;
 
   useEffect(() => {
     fetchData();
@@ -60,7 +50,7 @@ const Checkout: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleEditClick = (checkout: CheckoutType) => {
+  const handleEditClick = (checkout: Checkout) => {
     setSelectedCheckout(checkout);
     setFormData({
       pembayaranId: checkout.pembayaran.id.toString(),
@@ -126,54 +116,10 @@ const Checkout: React.FC = () => {
     }));
   };
 
-  // Determine error message, especially for 404
-  let errorMessage = error;
-  if ((error as any)?.response?.status === 404) {
-    errorMessage = `Checkout details not found for Payment ID: ${paymentIdParam}. Please check the ID or contact support.`;
-  }
-
-  // == Render Logic ==
-
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading checkout details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!paymentIdParam || isNaN(paymentIdParam)) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-600">
-          <p className="text-xl font-semibold">
-            Invalid Payment ID specified in the URL.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p className="text-xl font-semibold">
-            Error loading checkout details
-          </p>
-          <p className="mt-2">{errorMessage}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Checkout</h1>
+        <h1 className="text-2xl font-bold">Checkout Management</h1>
         <button
           onClick={handleAddClick}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -309,4 +255,4 @@ const Checkout: React.FC = () => {
   );
 };
 
-export default Checkout;
+export default CheckoutManagement;

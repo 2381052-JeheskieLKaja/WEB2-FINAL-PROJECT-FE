@@ -1,6 +1,11 @@
 // src/utils/AuthProvider.tsx
 
 import React, { createContext, ReactNode, useContext, useState } from "react";
+import {
+  RegisterData,
+  LoginData,
+  AuthResponse
+} from "../services/auth.service";
 
 // Tipe data untuk input registrasi (sesuaikan dengan kebutuhan API Anda)
 type RegisterInput = {
@@ -15,21 +20,16 @@ type AuthContextType = {
   logout: () => void;
   getToken: () => string | null;
   // Tambahkan fungsi register ke tipe context
-  register: (data: RegisterInput) => Promise<void>; // Promise void karena login internal yg update state
+  register: (data: RegisterData) => Promise<void>; // Promise void karena login internal yg update state
 };
 
 // --- API Endpoint (Ganti dengan URL endpoint Anda yang sebenarnya) ---
 const API_REGISTER_ENDPOINT = "/api/auth/register"; // Contoh
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    // Cek token saat inisialisasi provider
-    const token = localStorage.getItem("token");
-    // Di sini Anda mungkin ingin menambahkan validasi token (misalnya cek expired) jika memungkinkan
-    return !!token;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
@@ -46,54 +46,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("User logged out");
   };
 
-  const getToken = (): string | null => {
+  const getToken = () => {
     return localStorage.getItem("token");
   };
 
   // --- Implementasi Fungsi Register ---
-  const register = async (data: RegisterInput): Promise<void> => {
+  const register = async (data: RegisterData): Promise<void> => {
     try {
-      const response = await fetch(API_REGISTER_ENDPOINT, {
+      await fetch("/api/auth/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
-
-      const responseData = await response.json(); // Coba parse JSON terlepas dari status
-
-      if (!response.ok) {
-        // Jika ada pesan error dari backend, gunakan itu
-        const errorMessage = responseData?.message || `HTTP error! status: ${response.status}`;
-        throw new Error(`Registration failed: ${errorMessage}`);
-      }
-
-      // --- Handling Sukses ---
-      // Asumsi API mengembalikan token jika registrasi berhasil & langsung login
-      if (responseData && responseData.token) {
-        console.log("Registration successful, logging in...");
-        login(responseData.token); // Gunakan fungsi login internal
-      } else {
-        // Jika API tidak mengembalikan token (misalnya perlu verifikasi email dulu)
-        console.log("Registration successful, but no token returned. Please log in manually or verify your email.");
-        // Anda mungkin tidak ingin melakukan apa-apa di sini, atau mungkin set state tertentu
-        // Tergantung alur aplikasi Anda
-      }
-
     } catch (error) {
       console.error("Registration error:", error);
-      // Lemparkan ulang error agar komponen pemanggil bisa menanganinya
-      // (misalnya menampilkan pesan error di form registrasi)
-      if (error instanceof Error) {
-         throw new Error(`Registration failed: ${error.message}`);
-      } else {
-         throw new Error("An unknown registration error occurred.");
-      }
+      throw error;
     }
   };
   // --- Akhir Implementasi Fungsi Register ---
-
 
   return (
     <AuthContext.Provider
@@ -102,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         getToken,
-        register, // Tambahkan register ke value provider
+        register // Tambahkan register ke value provider
       }}
     >
       {children}

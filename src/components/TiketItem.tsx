@@ -1,7 +1,7 @@
 // src/components/TiketItem.tsx
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Tiket } from '../types/Tiket';
+import React from "react";
+import { motion } from "framer-motion";
+import { Tiket } from "../types/Tiket";
 
 interface TiketItemProps {
   tiket: Tiket;
@@ -13,25 +13,30 @@ interface TiketItemProps {
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: { y: 0, opacity: 1 },
-  exit: { y: -20, opacity: 0 },
+  exit: { y: -20, opacity: 0 }
 };
 
+const TiketItem: React.FC<TiketItemProps> = ({
+  tiket,
+  onEdit,
+  onDelete,
+  isDeleting
+}) => {
+  const handleDeleteClick: () => void = () => {
+    if (
+      window.confirm(`Are you sure you want to delete ticket "${tiket.nama}"?`)
+    ) {
+      onDelete(tiket.id);
+    }
+  };
 
-const TiketItem: React.FC<TiketItemProps> = ({ tiket, onEdit, onDelete, isDeleting }) => {
-  const handleDeleteClick = () => {
-      if (window.confirm(`Are you sure you want to delete ticket "${tiket.nama}"?`)) {
-          onDelete(tiket.id);
-      }
-  }
-
-  const formatDate = (dateString: string | Date | undefined) => {
-      if (!dateString) return 'N/A';
-      try {
-          return new Date(dateString).toLocaleString(); // Or use more specific formatting
-      } catch (e) {
-          return 'Invalid Date';
-      }
-  }
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch (e) {
+      return "Invalid Date";
+    }
+  };
 
   return (
     <motion.li
@@ -42,14 +47,23 @@ const TiketItem: React.FC<TiketItemProps> = ({ tiket, onEdit, onDelete, isDeleti
     >
       <div className="flex-1 mr-4">
         <h3 className="text-xl font-semibold text-indigo-700">{tiket.nama}</h3>
-        <p className="text-sm text-gray-600"><span className='font-medium'>Location:</span> {tiket.lokasi}</p>
-        <p className="text-sm text-gray-600"><span className='font-medium'>Date:</span> {formatDate(tiket.tanggal)}</p>
+        <p className="text-sm text-gray-600">
+          <span className="font-medium">Location:</span> {tiket.lokasi}
+        </p>
+        <p className="text-sm text-gray-600">
+          <span className="font-medium">Date:</span> {formatDate(tiket.tanggal)}
+        </p>
         <div className="flex space-x-4 text-sm text-gray-800 mt-1">
-            <p><span className='font-medium'>Price:</span> Rp {tiket.harga.toLocaleString('id-ID')}</p>
-            <p><span className='font-medium'>Stock:</span> {tiket.stok}</p>
+          <p>
+            <span className="font-medium">Price:</span> Rp{" "}
+            {tiket.harga.toLocaleString("id-ID")}
+          </p>
+          <p>
+            <span className="font-medium">Stock:</span> {tiket.stok}
+          </p>
         </div>
       </div>
-      <div className="flex space-x-2 flex-shrink-0">
+      <div className="flex space-x-2">
         <button
           onClick={() => onEdit(tiket)}
           className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition duration-150"
@@ -59,9 +73,13 @@ const TiketItem: React.FC<TiketItemProps> = ({ tiket, onEdit, onDelete, isDeleti
         <button
           onClick={handleDeleteClick}
           disabled={isDeleting}
-          className={`px-3 py-1 text-white text-sm rounded transition duration-150 ${isDeleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'}`}
+          className={`px-3 py-1 text-white text-sm rounded transition duration-150 ${
+            isDeleting
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-red-500 hover:bg-red-600"
+          }`}
         >
-          {isDeleting ? 'Deleting...' : 'Delete'}
+          {isDeleting ? "Deleting..." : "Delete"}
         </button>
       </div>
     </motion.li>

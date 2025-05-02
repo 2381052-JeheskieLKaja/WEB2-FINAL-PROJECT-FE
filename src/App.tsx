@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
-  RouterProvider,
+  RouterProvider
 } from "react-router-dom";
 
 // Layouts
@@ -19,6 +19,8 @@ import Payment from "./pages/Payment";
 import TicketAdmin from "./pages/TiketAdmin";
 import Checkout from "./pages/Checkout";
 import TiketApp from "./pages/Tiket";
+import PaymentManagement from "./pages/PaymentManagement";
+import CheckoutManagement from "./pages/CheckoutManagement";
 
 // Auth Utils
 import PrivateRoute from "./utils/PrivateRoute";
@@ -30,10 +32,9 @@ const queryClient = new QueryClient();
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      // Use a Fragment or no wrapper here if AuthProvider is outside
       <>
         {/* Public Routes */}
-        <Route element={<BaseLayout />}> {/* Layout for public pages */}
+        <Route element={<BaseLayout />}>
           <Route
             path="/login"
             element={
@@ -50,28 +51,35 @@ function App() {
               </PublicRoute>
             }
           />
-          {/* --- MOVE PAYMENT HERE FOR PUBLIC ACCESS --- */}
           <Route
             path="/payment/:id"
             element={
-              // Decide: Keep PublicRoute? Or remove if logged-in users CAN also access?
-              // <PublicRoute> // Maybe remove this wrapper if unnecessary
-                <Payment
-                  // These props likely need to be fetched or passed differently
-                  amount={0}
-                  currency={""}
-                  onPaymentSuccess={(details) => { console.log("Success:", details); }}
-                  onPaymentError={(error) => { console.error("Error:", error); }}
-                />
-              // </PublicRoute>
+              <Payment
+                amount={0}
+                currency={""}
+                onPaymentSuccess={(details) => {
+                  console.log("Success:", details);
+                }}
+                onPaymentError={(error) => {
+                  console.error("Error:", error);
+                }}
+              />
             }
           />
         </Route>
 
         {/* Protected Routes */}
-        <Route element={<RootLayout />}> {/* Layout for authenticated sections */}
-           <Route
-            path="tiket/:id"
+        <Route element={<RootLayout />}>
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tiket"
             element={
               <PrivateRoute>
                 <TiketApp />
@@ -95,23 +103,27 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/payment-management"
             element={
               <PrivateRoute>
-                <Home />
+                <PaymentManagement />
               </PrivateRoute>
             }
           />
-          {/* Add other private routes here */}
+          <Route
+            path="/checkout-management"
+            element={
+              <PrivateRoute>
+                <CheckoutManagement />
+              </PrivateRoute>
+            }
+          />
         </Route>
-        {/* Optional: Catch-all 404 Route */}
-        {/* <Route path="*" element={<NotFoundPage />} /> */}
       </>
     )
   );
 
   return (
-    // Standard Provider wrapping: Outermost to Innermost
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router} />

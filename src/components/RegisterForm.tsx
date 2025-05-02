@@ -22,18 +22,21 @@ const RegisterForm = () => {
       return;
     }
 
-    const success = await register(username, password);
-    if (success) {
+    try {
+      await register({ nama: username, email: username, password });
       alert("Registrasi berhasil! Silahkan login.");
       navigate("/login");
-    } else {
+    } catch (error) {
       alert("Registrasi gagal. Username mungkin sudah digunakan.");
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-80">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md w-80"
+      >
         <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
         <input
           type="text"
@@ -56,7 +59,10 @@ const RegisterForm = () => {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <button type="submit" className="w-full bg-green-500 text-white py-2 rounded mb-4">
+        <button
+          type="submit"
+          className="w-full bg-green-500 text-white py-2 rounded mb-4"
+        >
           Register
         </button>
 

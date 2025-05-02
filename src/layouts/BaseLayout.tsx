@@ -1,19 +1,18 @@
 import { Outlet } from "react-router-dom";
-import "../styles/BaseLayout.css"; // Ensure the correct path
+import Header from "../components/Header";
 
 const BaseLayout = () => {
   return (
-    <div>
-      <header className="header">
-        <h1>WELCOME TO EVENT RUN 2025</h1>
-      </header>
-
-      <main className="main">
-        <Outlet /> {/* Tempat render child routes */}
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <Outlet />
       </main>
-
-      <footer className="footer">
-        <p>© {new Date().getFullYear()} Universitas Advent Indonesia. All rights reserved.</p>
+      <footer className="bg-gray-800 text-white py-4 px-6">
+        <p className="text-center">
+          © {new Date().getFullYear()} Universitas Advent Indonesia. All rights
+          reserved.
+        </p>
       </footer>
     </div>
   );

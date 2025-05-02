@@ -1,10 +1,7 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../utils/AuthProvider";
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
-
-  if (isAuthenticated) {
+  if (!!localStorage.getItem("token")) {
     return <Navigate to="/" replace />;
   }
 

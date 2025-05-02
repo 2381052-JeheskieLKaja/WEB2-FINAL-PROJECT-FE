@@ -1,48 +1,45 @@
 // src/services/CheckoutAPI.ts
-import AxiosInstance from "../utils/AxiosInstance"; // Adjust path
-import { Checkout } from "../types/Checkout"; // Adjust path
+import axios from "axios";
+import { Checkout } from "../types/Checkout";
 
-const API_CHECKOUT_ENDPOINT = "/api/checkout"; // Base path for checkout API
+const API_URL = "http://localhost:3000/api";
 
-// --- Helper to create auth headers ---
-const createAuthHeaders = (token: string) => ({
-    Authorization: `Bearer ${token}`,
-});
-
-/**
- * Fetches a checkout record by its associated PembayaranTiket ID.
- */
-export const fetchCheckoutByPaymentId = async (
-    pembayaranId: number,
-    token: string
-): Promise<Checkout> => {
-    if (!pembayaranId) {
-        throw new Error("Payment ID is required to fetch checkout details.");
-    }
-    const response = await AxiosInstance.get<Checkout>(
-        `${API_CHECKOUT_ENDPOINT}/by-payment/${pembayaranId}`, // Use the specific endpoint
-        {
-            headers: createAuthHeaders(token),
-        }
-    );
-    return response.data;
+export const fetchCheckouts = async (): Promise<Checkout[]> => {
+  const response = await axios.get(`${API_URL}/checkout`);
+  return response.data;
 };
 
-// --- Add other functions if needed (e.g., createCheckout) ---
-/*
-import { CreateCheckoutPayload } from '../types/Checkout'; // Assuming you define this
+export const createCheckout = async (data: {
+  pembayaranId: number;
+  total_harga: number;
+}): Promise<Checkout> => {
+  const response = await axios.post(`${API_URL}/checkout`, data);
+  return response.data;
+};
 
-export const createCheckout = async (
-    payload: CreateCheckoutPayload,
-    token: string
+export const updateCheckout = async (
+  id: number,
+  data: { pembayaranId: number; total_harga: number }
 ): Promise<Checkout> => {
-    const response = await AxiosInstance.post<Checkout>(
-        API_CHECKOUT_ENDPOINT,
-        payload,
-        {
-             headers: createAuthHeaders(token),
-        }
-    );
-    return response.data;
-}
-*/
+  const response = await axios.put(`${API_URL}/checkout/${id}`, data);
+  return response.data;
+};
+
+export const deleteCheckout = async (id: number): Promise<void> => {
+  await axios.delete(`${API_URL}/checkout/${id}`);
+};
+
+export const fetchCheckoutByPaymentId = async (
+  paymentId: number,
+  token: string
+): Promise<Checkout> => {
+  const response = await axios.get(
+    `${API_URL}/checkout/by-payment/${paymentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+  return response.data;
+};

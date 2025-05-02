@@ -1,14 +1,25 @@
-// src/types/PembayaranTiket.ts (adjust based on your actual entity)
+// src/types/PembayaranTiket.ts
 export interface PembayaranTiket {
+  id: number;
+  userId: number;
+  tiketId: number;
+  user?: {
     id: number;
-    jumlah_tiket: number;
+    nama: string;
+    email: string;
+  };
+  tiket?: {
+    id: number;
+    nama: string;
+    lokasi: string;
+    tanggal: string;
+    harga: number;
+  };
+  checkout?: {
+    id: number;
+    tanggal: string;
     total_harga: number;
-    metode_pembayaran: string; // e.g., 'Credit Card', 'Bank Transfer'
-    status_pembayaran: string; // e.g., 'PENDING', 'SUCCESS', 'FAILED'
-    created_at?: string | Date;
-    updated_at?: string | Date;
-    // Add relation to Tiket if it exists and is needed for display
-    // tiket?: Tiket;
-    // Add relation to User if needed
-    // user?: User;
-  }
+  };
+  created_at: string;
+  updated_at: string;
+}

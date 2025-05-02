@@ -1,27 +1,22 @@
 // src/components/TiketApp.tsx (or wherever you place it)
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useAuth } from "../utils/AuthProvider"; // <--- Import useAuth
 
 import {
   fetchTickets,
   createTicket,
   updateTicket,
-  deleteTicket,
-  TiketPayload,
-} from "../services/TiketAPI"; // Adjust path
-import { Tiket } from "../types/Tiket"; // Adjust path
-import "../styles/Tiket.css"; // Adjust path if needed
+  deleteTicket
+} from "../services/TiketAPI";
+import { Tiket, TiketInput } from "../types/Tiket";
 
-// Helper functions (formatDateForInput, formatDateForAPI) remain the same...
 // Helper to format ISO date string for datetime-local input
-const formatDateForInput = (isoDate?: string | Date): string => {
-  if (!isoDate) return "";
+const formatDateForInput = (isoDate: string): string => {
   try {
     const date = new Date(isoDate);
-    if (isNaN(date.getTime())) return ""; // Invalid date
+    if (isNaN(date.getTime())) return "";
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
@@ -30,7 +25,7 @@ const formatDateForInput = (isoDate?: string | Date): string => {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   } catch (e) {
     console.error("Error formatting date for input:", isoDate, e);
-    return ""; // Fallback
+    return "";
   }
 };
 
@@ -47,417 +42,269 @@ const formatDateForAPI = (localDateTime?: string): string | undefined => {
   }
 };
 
-interface TiketFormInputs extends Omit<TiketPayload, "tanggal"> {
+interface TiketFormInputs extends TiketInput {
   tanggal: string;
 }
 
-function TiketApp() {
+const TiketApp = () => {
   const queryClient = useQueryClient();
-  const { getToken } = useAuth(); // <--- Get token from useAuth
-  const token = getToken();
+  const [selectedTicket, setSelectedTicket] = useState<Tiket | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
-  const isEditing = selectedTicketId !== null;
+  const {
+    data: tickets,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ["tickets"],
+    queryFn: fetchTickets
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createTicket,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      reset();
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: TiketInput }) =>
+      updateTicket(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      reset();
+      setSelectedTicket(null);
+      setIsEditing(false);
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTicket,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+    }
+  });
 
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
-    formState: { errors: formErrors, isSubmitting },
-  } = useForm<TiketFormInputs>({
-    defaultValues: {
-      nama: "",
-      lokasi: "",
-      tanggal: "",
-      harga: 0,
-      stok: 0,
-    },
-  });
+    formState: { errors }
+  } = useForm<TiketFormInputs>();
 
-  // == React Query: Fetching Tickets ==
-  const {
-    data: tickets = [],
-    isLoading: isLoadingTickets,
-    error: fetchError,
-    isFetching, // Use isFetching for background loading indicator
-  } = useQuery<Tiket[], Error>({
-    // Include token in the queryKey. React Query uses this for caching
-    // and passes it to the queryFn.
-    queryKey: ["tickets", token],
-    // Pass the token from the queryKey to the API function
-    queryFn: ({ queryKey }) => {
-      const _token = queryKey[1] as string; // Get token from key
-      if (!_token) {
-        // Or return Promise.reject(new Error("Not authenticated"));
-        return Promise.resolve([]); // Don't fetch if no token
-      }
-      return fetchTickets(_token);
-    },
-    // Only run the query if the token exists.
-    enabled: !!token,
-    staleTime: 5 * 60 * 1000, // Example: Cache data for 5 minutes
-  });
-
-  // == React Query: Create Ticket Mutation ==
-  const createMutation = useMutation<Tiket, Error, TiketPayload>({
-    // Wrap the API call to include the token from the component's scope
-    mutationFn: (newTicketData) => {
-      if (!token) return Promise.reject(new Error("Not authenticated"));
-      return createTicket(newTicketData, token);
-    },
-    onSuccess: (newTicket) => {
-      queryClient.invalidateQueries({ queryKey: ["tickets", token] }); // Invalidate with token
-      alert("Ticket created successfully!");
-      handleCancelEdit();
-    },
-    onError: (error) => {
-      console.error("Create Ticket Error:", error);
-      alert(`Failed to create ticket: ${error.message}`);
-    },
-  });
-
-  // == React Query: Update Ticket Mutation ==
-  const updateMutation = useMutation<
-    Tiket,
-    Error,
-    { id: number; data: Partial<TiketPayload> }
-  >({
-    // Wrap the API call
-    mutationFn: (updateData) => {
-      if (!token) return Promise.reject(new Error("Not authenticated"));
-      return updateTicket(updateData, token);
-    },
-    onSuccess: (updatedTicket) => {
-      queryClient.invalidateQueries({ queryKey: ["tickets", token] }); // Invalidate with token
-      alert("Ticket updated successfully!");
-      handleCancelEdit();
-    },
-    onError: (error) => {
-      console.error("Update Ticket Error:", error);
-      alert(`Failed to update ticket: ${error.message}`);
-    },
-  });
-
-  // == React Query: Delete Ticket Mutation ==
-  const deleteMutation = useMutation<void, Error, number>({
-    // Wrap the API call
-    mutationFn: (id) => {
-      if (!token) return Promise.reject(new Error("Not authenticated"));
-      return deleteTicket(id, token);
-    },
-    onSuccess: (_, deletedId) => {
-      queryClient.invalidateQueries({ queryKey: ["tickets", token] }); // Invalidate with token
-      alert("Ticket deleted successfully!");
-      if (selectedTicketId === deletedId) {
-        handleCancelEdit();
-      }
-    },
-    onError: (error) => {
-      console.error("Delete Ticket Error:", error);
-      alert(`Failed to delete ticket: ${error.message}`);
-    },
-  });
-
-  // == Form Handling Logic ==
   const handleSelectTicket = (ticket: Tiket) => {
-    setSelectedTicketId(ticket.id);
+    setSelectedTicket(ticket);
+    setIsEditing(true);
     reset({
       nama: ticket.nama,
       lokasi: ticket.lokasi,
-      tanggal: formatDateForInput(ticket.tanggal),
       harga: ticket.harga,
       stok: ticket.stok,
+      tanggal: formatDateForInput(ticket.tanggal)
     });
   };
 
   const handleCancelEdit = () => {
-    setSelectedTicketId(null);
+    setSelectedTicket(null);
+    setIsEditing(false);
     reset();
   };
 
   const onSubmit: SubmitHandler<TiketFormInputs> = (formData) => {
-    if (!token) {
-      alert("Authentication error. Please log in again.");
-      return;
-    }
-
-    const apiFormattedDate = formatDateForAPI(formData.tanggal);
-    if (formData.tanggal && !apiFormattedDate) {
-      // Check if input was given but formatting failed
-      alert("Invalid date format provided.");
-      // Optionally set a specific form error:
-      // setError("tanggal", { type: "manual", message: "Invalid date format." });
-      return;
-    }
-    if (!apiFormattedDate) {
-      // Handle case where date is required but missing/invalid
-      alert("Date is required.");
-      // setError("tanggal", { type: "manual", message: "Date is required." });
-      return;
-    }
-
-    const payload: TiketPayload = {
+    const ticketData: TiketInput = {
       nama: formData.nama,
       lokasi: formData.lokasi,
-      harga: Number(formData.harga) || 0,
-      stok: Number(formData.stok) || 0,
-      tanggal: apiFormattedDate, // Use the ISO formatted date string
+      harga: formData.harga,
+      stok: formData.stok,
+      tanggal: formatDateForAPI(formData.tanggal) || ""
     };
 
-    if (isEditing && selectedTicketId) {
-      updateMutation.mutate({ id: selectedTicketId, data: payload });
+    if (isEditing && selectedTicket) {
+      updateMutation.mutate({ id: selectedTicket.id, data: ticketData });
     } else {
-      createMutation.mutate(payload);
+      createMutation.mutate(ticketData);
     }
   };
 
   const handleDelete = (id: number) => {
-    if (!token) {
-      alert("Authentication error. Please log in again.");
-      return;
-    }
-    if (window.confirm(`Are you sure you want to delete ticket ID: ${id}?`)) {
+    if (window.confirm("Are you sure you want to delete this ticket?")) {
       deleteMutation.mutate(id);
     }
   };
 
-  // Consolidate loading states
-  const isMutating =
-    createMutation.isPending ||
-    updateMutation.isPending ||
-    deleteMutation.isPending;
-  const overallLoading =
-    isLoadingTickets || isSubmitting || isMutating || isFetching; // Include isFetching for refetch indicator
+  if (isLoading) return <div className="text-center py-8">Loading...</div>;
+  if (error)
+    return (
+      <div className="text-center py-8 text-red-600">Error loading tickets</div>
+    );
 
-  // Consolidate errors (fetch and mutation)
-  const mutationError =
-    createMutation.error || updateMutation.error || deleteMutation.error;
-  const displayError = fetchError || mutationError;
-
-  // == Render ==
   return (
-    <div className="tiket-app-container">
-      <h1>Ticket Management</h1>
-      {/* Auth Status/Error */}
-      {!token && (
-        <div className="status-message error">
-          Please log in to manage tickets.
-        </div>
-      )}
-      {/* Display Loading States */}
-      {isLoadingTickets && !tickets.length && (
-        <div className="status-message loading">Loading initial tickets...</div>
-      )}
-      {isFetching && !isLoadingTickets && (
-        <div className="status-message loading background">
-          Checking for updates...
-        </div>
-      )}{" "}
-      {/* Background refresh indicator */}
-      {/* Display Errors */}
-      {displayError && (
-        <div className="status-message error">
-          Error: {displayError.message}
-        </div>
-      )}
-      {/* --- Create/Update Form (Only render if token exists) --- */}
-      {token && (
-        <div className="tiket-form-container">
-          <h2 className="form-title">
-            {isEditing
-              ? `Edit Ticket (ID: ${selectedTicketId})`
-              : "Create New Ticket"}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">Ticket Management</h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Form Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            {isEditing ? "Edit Ticket" : "Create New Ticket"}
           </h2>
-          <form className="tiket-form" onSubmit={handleSubmit(onSubmit)}>
-            {/* Input fields remain the same... */}
-            {/* Nama Input */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="nama">
-                Name:
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
               </label>
               <input
                 type="text"
-                id="nama"
-                className={`form-input ${formErrors.nama ? "input-error" : ""}`}
-                {...register("nama", { required: "Ticket name is required" })}
-                disabled={overallLoading}
+                {...register("nama", { required: "Name is required" })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {formErrors.nama && (
-                <p className="error-message">{formErrors.nama.message}</p>
+              {errors.nama && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.nama.message}
+                </p>
               )}
             </div>
 
-            {/* Lokasi Input */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="lokasi">
-                Location:
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Location
               </label>
               <input
                 type="text"
-                id="lokasi"
-                className={`form-input ${
-                  formErrors.lokasi ? "input-error" : ""
-                }`}
                 {...register("lokasi", { required: "Location is required" })}
-                disabled={overallLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {formErrors.lokasi && (
-                <p className="error-message">{formErrors.lokasi.message}</p>
+              {errors.lokasi && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.lokasi.message}
+                </p>
               )}
             </div>
 
-            {/* Tanggal Input */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="tanggal">
-                Date & Time:
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Price
+              </label>
+              <input
+                type="number"
+                {...register("harga", {
+                  required: "Price is required",
+                  min: 0
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              {errors.harga && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.harga.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock
+              </label>
+              <input
+                type="number"
+                {...register("stok", {
+                  required: "Stock is required",
+                  min: 0,
+                  valueAsNumber: true
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                min="0"
+                step="1"
+              />
+              {errors.stok && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.stok.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
               </label>
               <input
                 type="datetime-local"
-                id="tanggal"
-                className={`form-input ${
-                  formErrors.tanggal ? "input-error" : ""
-                }`}
-                {...register("tanggal", {
-                  required: "Date and time are required",
-                })}
-                disabled={overallLoading}
+                {...register("tanggal", { required: "Date is required" })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {formErrors.tanggal && (
-                <p className="error-message">{formErrors.tanggal.message}</p>
+              {errors.tanggal && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.tanggal.message}
+                </p>
               )}
             </div>
 
-            {/* Harga Input */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="harga">
-                Price:
-              </label>
-              <input
-                type="number"
-                id="harga"
-                className={`form-input ${
-                  formErrors.harga ? "input-error" : ""
-                }`}
-                min="0"
-                step="0.01"
-                {...register("harga", {
-                  required: "Price is required",
-                  valueAsNumber: true,
-                  min: { value: 0, message: "Price cannot be negative" },
-                })}
-                disabled={overallLoading}
-              />
-              {formErrors.harga && (
-                <p className="error-message">{formErrors.harga.message}</p>
-              )}
-            </div>
-
-            {/* Stok Input */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="stok">
-                Stock:
-              </label>
-              <input
-                type="number"
-                id="stok"
-                className={`form-input ${formErrors.stok ? "input-error" : ""}`}
-                min="0"
-                step="1"
-                {...register("stok", {
-                  required: "Stock is required",
-                  valueAsNumber: true,
-                  min: { value: 0, message: "Stock cannot be negative" },
-                })}
-                disabled={overallLoading}
-              />
-              {formErrors.stok && (
-                <p className="error-message">{formErrors.stok.message}</p>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="form-actions">
+            <div className="flex space-x-4">
               <button
                 type="submit"
-                className="form-button"
-                disabled={overallLoading || !token}
+                className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                {isMutating
-                  ? "Saving..."
-                  : isEditing
-                  ? "Update Ticket"
-                  : "Create Ticket"}
+                {isEditing ? "Update Ticket" : "Create Ticket"}
               </button>
               {isEditing && (
                 <button
                   type="button"
-                  className="form-button cancel-button"
                   onClick={handleCancelEdit}
-                  disabled={overallLoading} // Don't disable based on token here
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
-                  Cancel Edit
+                  Cancel
                 </button>
               )}
             </div>
           </form>
         </div>
-      )}
-      {/* --- Ticket List (Only render if token exists and data available) --- */}
-      {token && (
-        <div className="tiket-list-container">
-          <h2>Available Tickets</h2>
-          {isLoadingTickets && !tickets.length ? null : tickets.length === 0 && // Already showing loading message above
-            !isLoadingTickets ? ( // Handle case after loading completes
-            <p>No tickets found.</p>
-          ) : (
-            <ul className="tiket-list">
-              {tickets.map((ticket) => (
-                <li
-                  key={ticket.id}
-                  className={`tiket-item ${
-                    selectedTicketId === ticket.id ? "selected" : ""
-                  }`}
-                >
-                  <div className="tiket-info">
-                    <strong>{ticket.nama}</strong> (ID: {ticket.id})<br />
-                    Location: {ticket.lokasi}
-                    <br />
-                    Date:{" "}
-                    {ticket.tanggal
-                      ? new Date(ticket.tanggal).toLocaleString()
-                      : "N/A"}
-                    <br />
-                    Price: Rp {ticket.harga?.toFixed(2) ?? "0.00"} | Stock:{" "}
-                    {ticket.stok ?? 0}
+
+        {/* Tickets List Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold mb-4">Tickets List</h2>
+          <div className="space-y-4">
+            {tickets?.map((ticket) => (
+              <div
+                key={ticket.id}
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">{ticket.nama}</h3>
+                    <p className="text-gray-600">{ticket.lokasi}</p>
+                    <div className="mt-2 space-y-1">
+                      <p className="text-sm">
+                        <span className="font-medium">Price:</span> Rp
+                        {ticket.harga}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">Date:</span>{" "}
+                        {new Date(ticket.tanggal).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="tiket-actions">
+                  <div className="flex space-x-2">
                     <button
-                      className="edit-button"
                       onClick={() => handleSelectTicket(ticket)}
-                      disabled={overallLoading || isEditing}
+                      className="text-indigo-600 hover:text-indigo-800"
                     >
                       Edit
                     </button>
                     <button
-                      className="delete-button"
                       onClick={() => handleDelete(ticket.id)}
-                      disabled={overallLoading || deleteMutation.isPending} // More specific disable
+                      className="text-red-600 hover:text-red-800"
                     >
-                      {deleteMutation.isPending &&
-                      deleteMutation.variables === ticket.id
-                        ? "Deleting..."
-                        : "Delete"}
+                      Delete
                     </button>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};
 
 export default TiketApp;
