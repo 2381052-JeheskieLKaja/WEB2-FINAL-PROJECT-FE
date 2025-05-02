@@ -3,33 +3,43 @@ import { useAuth } from "../utils/AuthProvider";
 
 const Home = () => {
   const { getToken } = useAuth();
-  const isAdmin = getToken() ? true : false; // In a real app, check user role from token
+  // NOTE: Checking roles properly often involves decoding the token.
+  // Keeping the simple check as requested.
+  const isAdmin = getToken() ? true : false;
 
+  // Changed: Removed min-h-screen and background gradient. BaseLayout handles page bg (white).
+  // Added text-black as default text color for this component scope.
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
+    <div className="p-8 text-black w-full"> {/* Added w-full for safety within flex context */}
+      {/* Changed: Header text colors */}
       <header className="mb-12 text-center">
-        <h1 className="text-5xl font-bold text-gray-800 mb-4">
+        <h1 className="text-5xl font-bold text-black mb-4"> {/* Changed text-white to text-black */}
           Event Lari Dashboard
         </h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-xl text-gray-700"> {/* Changed text-gray-300 to text-gray-700 */}
           Selamat datang di sistem manajemen event lari
         </p>
       </header>
 
+      {/* Grid container remains the same */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* Event Management */}
+        {/* Event Management Card */}
+        {/* Kept hover:scale-105 as it's not a color change */}
         <Link
           to="/tiket"
-          className="transform transition-all duration-300 hover:scale-105"
+          className="transform transition-all duration-300 hover:scale-105 group" // Added 'group' for potential hover effects
         >
-          <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-indigo-600 mb-4">
+          {/* Changed: Card styling - background, border, hover state */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50"> {/* Changed bg, removed shadow, added border, adjusted hover */}
+             {/* Changed: Icon color */}
+            <div className="text-gray-600 mb-4 group-hover:text-black transition-colors duration-300"> {/* Changed icon color, added hover effect */}
               <svg
                 className="w-12 h-12"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
+                {/* Path is unchanged */}
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -38,26 +48,30 @@ const Home = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+            {/* Changed: Text colors */}
+            <h3 className="text-2xl font-semibold text-black mb-2"> {/* Changed text-white to text-black */}
               Event Management
             </h3>
-            <p className="text-gray-600">Kelola daftar event lari</p>
+            <p className="text-gray-700">Kelola daftar event lari</p> {/* Changed text-gray-300 */}
           </div>
         </Link>
 
-        {/* Payment Management */}
+        {/* Payment Management Card */}
         <Link
           to="/payment-management"
-          className="transform transition-all duration-300 hover:scale-105"
+          className="transform transition-all duration-300 hover:scale-105 group"
         >
-          <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-indigo-600 mb-4">
+           {/* Changed: Card styling - consistent B&W theme */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50">
+            {/* Changed: Icon color */}
+            <div className="text-gray-600 mb-4 group-hover:text-black transition-colors duration-300">
               <svg
                 className="w-12 h-12"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
+                 {/* Path is unchanged */}
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -66,26 +80,30 @@ const Home = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+             {/* Changed: Text colors */}
+            <h3 className="text-2xl font-semibold text-black mb-2">
               Payment Management
             </h3>
-            <p className="text-gray-600">Kelola pembayaran tiket</p>
+            <p className="text-gray-700">Kelola pembayaran tiket</p>
           </div>
         </Link>
 
-        {/* Checkout Management */}
+        {/* Checkout Management Card */}
         <Link
           to="/checkout-management"
-          className="transform transition-all duration-300 hover:scale-105"
+          className="transform transition-all duration-300 hover:scale-105 group"
         >
-          <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-            <div className="text-indigo-600 mb-4">
+          {/* Changed: Card styling - consistent B&W theme */}
+          <div className="bg-white rounded-xl border border-gray-200 p-8 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50">
+             {/* Changed: Icon color */}
+            <div className="text-gray-600 mb-4 group-hover:text-black transition-colors duration-300">
               <svg
                 className="w-12 h-12"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
+                {/* Path is unchanged */}
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -94,27 +112,31 @@ const Home = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+            {/* Changed: Text colors */}
+            <h3 className="text-2xl font-semibold text-black mb-2">
               Checkout Management
             </h3>
-            <p className="text-gray-600">Kelola proses checkout</p>
+            <p className="text-gray-700">Kelola proses checkout</p>
           </div>
         </Link>
 
-        {/* Admin Only Features */}
+        {/* Admin Only Features Card */}
         {isAdmin && (
           <Link
             to="/admin/ticket"
-            className="transform transition-all duration-300 hover:scale-105"
+            className="transform transition-all duration-300 hover:scale-105 group"
           >
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-              <div className="text-indigo-600 mb-4">
+            {/* Changed: Card styling - consistent B&W theme */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50">
+               {/* Changed: Icon color */}
+              <div className="text-gray-600 mb-4 group-hover:text-black transition-colors duration-300">
                 <svg
                   className="w-12 h-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
+                   {/* Path is unchanged */}
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -123,10 +145,11 @@ const Home = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+              {/* Changed: Text colors */}
+              <h3 className="text-2xl font-semibold text-black mb-2">
                 Admin Ticket Management
               </h3>
-              <p className="text-gray-600">Kelola tiket sebagai admin</p>
+              <p className="text-gray-700">Kelola tiket sebagai admin</p>
             </div>
           </Link>
         )}

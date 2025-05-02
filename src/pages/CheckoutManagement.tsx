@@ -122,7 +122,7 @@ const CheckoutManagement: React.FC = () => {
         <h1 className="text-2xl font-bold">Checkout Management</h1>
         <button
           onClick={handleAddClick}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Add New Checkout
         </button>
@@ -237,7 +237,7 @@ const CheckoutManagement: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:opacity-50"
                   >
                     {isLoading
                       ? "Saving..."

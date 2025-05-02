@@ -64,13 +64,13 @@ const Payment: React.FC<PaymentProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-md mx-auto p-6 bg-gray-800 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Payment Details</h2>
+        <h2 className="text-2xl font-bold text-white">Payment Details</h2>
         {isEditable && onAdd && (
           <button
             onClick={onAdd}
-            className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+            className="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-500 transition-colors"
           >
             Add
           </button>
@@ -78,7 +78,7 @@ const Payment: React.FC<PaymentProps> = ({
       </div>
 
       <div className="mb-6">
-        <p className="text-lg font-semibold text-gray-700">
+        <p className="text-lg font-semibold text-gray-300">
           Amount to Pay:{" "}
           {new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -91,7 +91,7 @@ const Payment: React.FC<PaymentProps> = ({
         <div>
           <label
             htmlFor="cardNumber"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-300 mb-1"
           >
             Card Number
           </label>
@@ -102,7 +102,7 @@ const Payment: React.FC<PaymentProps> = ({
             value={cardDetails.cardNumber}
             onChange={handleInputChange}
             placeholder="1234 5678 9012 3456"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
             disabled={!isEditable}
           />
@@ -112,7 +112,7 @@ const Payment: React.FC<PaymentProps> = ({
           <div>
             <label
               htmlFor="expiryDate"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Expiry Date (MM/YY)
             </label>
@@ -123,7 +123,7 @@ const Payment: React.FC<PaymentProps> = ({
               value={cardDetails.expiryDate}
               onChange={handleInputChange}
               placeholder="MM/YY"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
               disabled={!isEditable}
             />
@@ -132,7 +132,7 @@ const Payment: React.FC<PaymentProps> = ({
           <div>
             <label
               htmlFor="cvc"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               CVC
             </label>
@@ -143,7 +143,7 @@ const Payment: React.FC<PaymentProps> = ({
               value={cardDetails.cvc}
               onChange={handleInputChange}
               placeholder="123"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
               required
               disabled={!isEditable}
             />
@@ -153,7 +153,7 @@ const Payment: React.FC<PaymentProps> = ({
         <div>
           <label
             htmlFor="nameOnCard"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-300 mb-1"
           >
             Name on Card
           </label>
@@ -164,18 +164,20 @@ const Payment: React.FC<PaymentProps> = ({
             value={cardDetails.nameOnCard}
             onChange={handleInputChange}
             placeholder="John Doe"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
             disabled={!isEditable}
           />
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 text-red-600 rounded-md">{error}</div>
+          <div className="p-3 bg-red-900/50 text-red-400 rounded-md">
+            {error}
+          </div>
         )}
 
         {successMessage && (
-          <div className="p-3 bg-green-50 text-green-600 rounded-md">
+          <div className="p-3 bg-green-900/50 text-green-400 rounded-md">
             {successMessage}
           </div>
         )}
@@ -185,15 +187,15 @@ const Payment: React.FC<PaymentProps> = ({
           disabled={isLoading || !isEditable}
           className={`w-full py-2 px-4 rounded-md text-white font-medium ${
             isLoading || !isEditable
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
+              ? "bg-gray-900 cursor-not-allowed"
+              : "bg-gray-600 hover:bg-gray-500"
           }`}
         >
           {isLoading ? "Processing..." : "Pay Now"}
         </button>
       </form>
 
-      <div className="mt-6 text-sm text-gray-500">
+      <div className="mt-6 text-sm text-gray-400">
         <p className="text-center">
           Your payment is secure and encrypted. We never store your card
           details.

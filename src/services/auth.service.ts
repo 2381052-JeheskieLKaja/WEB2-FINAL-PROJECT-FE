@@ -21,12 +21,14 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-  nama: string;
+  username: string;
+  nama : string;
   email: string;
   password: string;
 }
 
 export interface AuthResponse {
+  token: string;
   access_token: string;
   user: {
     id: number;
