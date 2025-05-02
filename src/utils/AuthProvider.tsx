@@ -1,18 +1,9 @@
 // src/utils/AuthProvider.tsx
 
-import React, { createContext, ReactNode, useContext, useState } from "react";
-import {
-  RegisterData,
-  LoginData,
-  AuthResponse
-} from "../services/auth.service";
+import { createContext, ReactNode, useContext, useState } from "react";
+import { RegisterData } from "../services/auth.service";
 
-// Tipe data untuk input registrasi (sesuaikan dengan kebutuhan API Anda)
-type RegisterInput = {
-  email: string; // Atau username
-  password: string;
-  // Tambahkan field lain jika perlu (misal: name, etc.)
-};
+
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -23,8 +14,7 @@ type AuthContextType = {
   register: (data: RegisterData) => Promise<void>; // Promise void karena login internal yg update state
 };
 
-// --- API Endpoint (Ganti dengan URL endpoint Anda yang sebenarnya) ---
-const API_REGISTER_ENDPOINT = "/api/auth/register"; // Contoh
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
